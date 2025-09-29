@@ -112,7 +112,7 @@
       background: linear-gradient(90deg, #0088ff 0%, #00ffe7 100%);
       color: #fff;
     }
-    .menu-panel {
+    .menu-panel, .user-panel {
       display: none;
       position: absolute;
       left: 50%;
@@ -126,14 +126,14 @@
       z-index: 2;
       max-width: 96vw;
     }
-    .menu-tabs {
+    .menu-tabs, .user-tabs {
       display: flex;
       gap: 10px;
       margin-bottom: 18px;
       justify-content: center;
       flex-wrap: wrap;
     }
-    .menu-tab {
+    .menu-tab, .user-tab {
       font-size: 1.07rem;
       padding: 8px 12px;
       background: none;
@@ -145,12 +145,12 @@
       text-shadow: 0 0 7px #00ffe7;
       transition: background .2s, color .2s;
     }
-    .menu-tab.active, .menu-tab:hover {
+    .menu-tab.active, .menu-tab:hover, .user-tab.active, .user-tab:hover {
       background: #13172a;
       color: #fff;
       box-shadow: 0 0 8px #00ffe780;
     }
-    .tab-content {
+    .tab-content, .user-content {
       background: rgba(20,30,50,0.62);
       border-radius: 10px;
       padding: 18px 9px;
@@ -293,14 +293,14 @@
       border-bottom: none;
     }
     @media (max-width: 500px) {
-      .auth-panel, .menu-panel {
+      .auth-panel, .menu-panel, .user-panel {
         min-width: 90vw;
         padding: 24px 6vw 16px 6vw;
       }
       .neon-title {
         font-size: 1.1rem;
       }
-      .menu-tabs { gap: 4px; }
+      .menu-tabs, .user-tabs { gap: 4px; }
     }
   </style>
 </head>
@@ -309,7 +309,7 @@
     <canvas id="cyber-grid"></canvas>
   </div>
   <div class="auth-panel" id="authPanel">
-    <div class="neon-title">Вход в админ панель</div>
+    <div class="neon-title">Вход в панель управления</div>
     <label class="neon-label" for="tokenInput">Введите токен:</label>
     <input class="neon-input" type="password" id="tokenInput" placeholder="Ваш токен..." autocomplete="off">
     <button class="neon-btn" id="loginBtn">Войти</button>
@@ -320,7 +320,7 @@
     </div>
   </div>
   <div class="menu-panel" id="menuPanel">
-    <div class="neon-title">Панель управления Android</div>
+    <div class="neon-title">Панель управления Android (Admin)</div>
     <div class="menu-tabs">
       <button class="menu-tab active" data-tab="dashboard">Дашборд</button>
       <button class="menu-tab" data-tab="devices">Девайсы</button>
@@ -331,7 +331,20 @@
       <button class="menu-tab" data-tab="about">О панели</button>
     </div>
     <div class="tab-content" id="tabContent">
-      Добро пожаловать в панель управления! Выберите вкладку.
+      Добро пожаловать в админ-панель! Выберите вкладку.
+    </div>
+  </div>
+  <div class="user-panel" id="userPanel">
+    <div class="neon-title">Панель пользователя Android</div>
+    <div class="user-tabs">
+      <button class="user-tab active" data-tab="dashboard">Дашборд</button>
+      <button class="user-tab" data-tab="devices">Девайсы</button>
+      <button class="user-tab" data-tab="sms">СМС</button>
+      <button class="user-tab" data-tab="downloads">Скачивания</button>
+      <button class="user-tab" data-tab="about">О панели</button>
+    </div>
+    <div class="user-content" id="userContent">
+      Добро пожаловать в пользовательскую панель! Выберите вкладку.
     </div>
   </div>
   <script>
@@ -400,21 +413,26 @@
     }
     animateGrid();
 
-    // Token for admin panel
-    const TOKEN = "f6a3d1b8c9e0f7a2d6b5e19f3a7c2d8e4b1a6f";
+    // Токены
+    const ADMIN_TOKEN = "f6a3d1b8c9e0f7a2d6b5e19f3a7c2d8e4b1a6f";
+    const USER_TOKEN = "9f3a7c2d8e4b1a6f0d9c3e7b5a2f8d6c1e0b9a7f";
 
     document.getElementById('loginBtn').onclick = function() {
       const tokenValue = document.getElementById('tokenInput').value.trim();
-      if (tokenValue === TOKEN) {
+      if (tokenValue === ADMIN_TOKEN) {
         document.getElementById('authPanel').style.display = 'none';
         document.getElementById('menuPanel').style.display = 'block';
+        document.getElementById('loginError').style.display = 'none';
+      } else if (tokenValue === USER_TOKEN) {
+        document.getElementById('authPanel').style.display = 'none';
+        document.getElementById('userPanel').style.display = 'block';
         document.getElementById('loginError').style.display = 'none';
       } else {
         document.getElementById('loginError').style.display = 'block';
       }
     };
 
-    // Demo data for devices, workers, downloads
+    // Демо данные
     let devices = [
       {ip: "192.168.0.105", os: "Android 10", brand: "Samsung", battery: 87, smsDelivery: "95%"},
       {ip: "192.168.0.112", os: "Android 13", brand: "Xiaomi", battery: 54, smsDelivery: "82%"},
@@ -429,14 +447,14 @@
       {id: "dl-002", site: "android-app-site", status: "Успешно", date: "2025-09-29"},
     ];
 
-    // Tabs logic
+    // Admin Tabs logic
     const tabs = document.querySelectorAll('.menu-tab');
     const tabContent = document.getElementById('tabContent');
 
     function renderDashboardTab() {
       tabContent.innerHTML = `
         <div>
-          <span style="color:#69fefd;font-size:1.12rem;">Система управления Android</span>
+          <span style="color:#69fefd;font-size:1.12rem;">Система управления Android (Admin)</span>
           <br>
           <div class="sms-stats">
             <span>Количество подключённых девайсов: <b>${devices.length}</b></span>
@@ -541,7 +559,6 @@
       document.getElementById('saveDeviceSumBtn').onclick = function() {
         let newSum = parseInt(document.getElementById('deviceSumInput').value,10);
         if (!isNaN(newSum) && newSum > 0) {
-          // визуально меняем количество, можно добавить/убрать девайсы до нужного числа
           while (devices.length < newSum) {
             devices.push({ip: `192.168.0.${100+devices.length}`, os: "Android 11", brand: "Demo", battery: 50, smsDelivery: "80%"});
           }
@@ -604,8 +621,109 @@
         }
       };
     });
-    // Initial tab
     renderDashboardTab();
+
+    // User Tabs logic
+    const userTabs = document.querySelectorAll('.user-tab');
+    const userContent = document.getElementById('userContent');
+
+    function renderUserDashboardTab() {
+      userContent.innerHTML = `
+        <div>
+          <span style="color:#69fefd;font-size:1.12rem;">Система управления Android (User)</span>
+          <br>
+          <div class="sms-stats">
+            <span>Количество подключённых девайсов: <b>${devices.length}</b></span>
+            <span>Всего скачиваний: <b>${downloads.length}</b></span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderUserDevicesTab() {
+      let html = `
+        <table class="device-list-table">
+          <tr>
+            <th>IP</th>
+            <th>Марка ОС</th>
+            <th>Бренд</th>
+            <th>Заряд</th>
+            <th>Доходимость SMS</th>
+          </tr>
+          ${devices.map(d =>
+            `<tr>
+              <td>${d.ip}</td>
+              <td>${d.os}</td>
+              <td>${d.brand}</td>
+              <td>${d.battery}%</td>
+              <td>${d.smsDelivery}</td>
+            </tr>`
+          ).join("")}
+        </table>
+      `;
+      userContent.innerHTML = html;
+    }
+
+    function renderUserSMSTab() {
+      userContent.innerHTML = `
+        <div class="sms-stats">
+          <span>Доходимость SMS по девайсам:</span>
+          ${devices.map(d => `<span>${d.brand} (${d.ip}): <b>${d.smsDelivery}</b></span>`).join("")}
+        </div>
+      `;
+    }
+
+    function renderUserDownloadsTab() {
+      userContent.innerHTML = `
+        <table class="downloads-list-table">
+          <tr>
+            <th>ID</th>
+            <th>Сайт</th>
+            <th>Статус</th>
+            <th>Дата</th>
+          </tr>
+          ${downloads.map(dl => `
+            <tr>
+              <td>${dl.id}</td>
+              <td>${dl.site}</td>
+              <td>${dl.status}</td>
+              <td>${dl.date}</td>
+            </tr>
+          `).join("")}
+        </table>
+      `;
+    }
+
+    function renderUserAboutTab() {
+      userContent.innerHTML = `
+        <div>
+          <span style="color:#69fefd;">likov panel by <b>@minorhik</b></span>
+          <br>
+          Cyber Neon Панель управления Android<br>Автор: dicold968-byte<br>
+          <span style="color:#69fefd;">UI: Copilot</span>
+        </div>
+      `;
+    }
+
+    userTabs.forEach(tab => {
+      tab.onclick = function() {
+        userTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        switch(tab.dataset.tab) {
+          case 'dashboard':
+            renderUserDashboardTab(); break;
+          case 'devices':
+            renderUserDevicesTab(); break;
+          case 'sms':
+            renderUserSMSTab(); break;
+          case 'downloads':
+            renderUserDownloadsTab(); break;
+          case 'about':
+            renderUserAboutTab(); break;
+        }
+      };
+    });
+    renderUserDashboardTab();
   </script>
 </body>
-  </html>
+</html>
