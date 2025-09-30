@@ -1,0 +1,321 @@
+<script>
+// --- More Tabs ("⋯") Dropdown ---
+
+// 1. Добавляем кнопку троеточие и контейнер для вкладок "ещё"
+document.querySelector('#adminTabs').innerHTML += `
+  <button class="panel-tab more-tab" data-tab="more" title="Ещё">⋯</button>
+`;
+document.querySelector('#userTabs').innerHTML += `
+  <button class="panel-tab more-tab" data-tab="more" title="Ещё">⋯</button>
+`;
+
+// 2. Список "ещё" вкладок
+const moreTabsAdmin = [
+  {tab:"reports", label:"Отчёты"},
+  {tab:"apitokens", label:"API-токены"},
+  {tab:"integrations", label:"Интеграции"},
+  {tab:"calendar", label:"Календарь"},
+  {tab:"docs", label:"Документация"},
+  {tab:"faq", label:"FAQ/Помощь"},
+  {tab:"themes", label:"Темы/Стили"},
+  {tab:"syslogs", label:"Системные логи"},
+  {tab:"backups", label:"Бэкапы"},
+  {tab:"errors", label:"Ошибки"},
+  {tab:"bulk", label:"Массовые действия"},
+  {tab:"monitor", label:"Мониторинг"},
+  {tab:"advdash", label:"Дашборды+"}
+];
+const moreTabsUser = [
+  {tab:"calendar", label:"Календарь"},
+  {tab:"faq", label:"FAQ/Помощь"},
+  {tab:"themes", label:"Темы/Стили"},
+  {tab:"docs", label:"Документация"}
+];
+
+// 3. Модальное меню для "ещё"
+function showMoreTabsModal(isAdmin=true) {
+  const tabs = isAdmin ? moreTabsAdmin : moreTabsUser;
+  showModal(`
+    <div style="text-align:center;">
+      <div style="font-size:1.18rem;margin-bottom:12px;color:#00ffe7;">Дополнительные вкладки</div>
+      <div>
+        ${tabs.map(t=>`
+          <button class="neon-btn" style="margin:5px 9px;font-size:1rem;padding:10px 21px;" onclick="chooseMoreTab('${t.tab}','${isAdmin? 'admin':'user'}')">${t.label}</button>
+        `).join("")}
+      </div>
+    </div>
+  `);
+}
+window.chooseMoreTab = function(tab, role) {
+  closeModal();
+  if(role==="admin") renderAdminTab(tab);
+  else renderUserTab(tab);
+}
+// 4. Слушатели на троеточие
+document.querySelector('#adminTabs .more-tab').onclick = ()=>showMoreTabsModal(true);
+document.querySelector('#userTabs .more-tab').onclick = ()=>showMoreTabsModal(false);
+
+// 5. Реализация функций-вкладок
+function renderAdminReports() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Отчёты</div>
+    <div>Генерация и просмотр отчётов за периоды.<br>
+    <button class="neon-btn" style="margin:10px 0;">Скачать PDF</button>
+    <table class="table-list">
+      <tr><th>Период</th><th>Девайсы</th><th>Воркеры</th><th>Ошибки</th></tr>
+      <tr><td>Сентябрь</td><td>12</td><td>5</td><td>1</td></tr>
+      <tr><td>Август</td><td>10</td><td>3</td><td>0</td></tr>
+    </table>
+    </div>
+  `;
+}
+function renderAdminAPITokens() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">API-токены</div>
+    <div>
+      <input class="neon-input" placeholder="Новый токен..." id="newApiToken">
+      <button class="neon-btn" onclick="addApiToken()">Добавить</button>
+      <ul id="apiTokensList" style="text-align:left;list-style:none;margin:15px 0 0 0;padding:0;">
+        <li>abcdef123456 <button class="neon-btn" style="padding:4px 10px;font-size:0.93rem;" onclick="deleteApiToken(this)">Удалить</button></li>
+        <li>ghijk789012 <button class="neon-btn" style="padding:4px 10px;font-size:0.93rem;" onclick="deleteApiToken(this)">Удалить</button></li>
+      </ul>
+    </div>
+  `;
+}
+window.addApiToken = function() {
+  let val = document.getElementById('newApiToken').value.trim();
+  if(val) {
+    let ul = document.getElementById('apiTokensList');
+    ul.innerHTML += `<li>${val} <button class="neon-btn" style="padding:4px 10px;font-size:0.93rem;" onclick="deleteApiToken(this)">Удалить</button></li>`;
+    showToast("Токен добавлен","success");
+    document.getElementById('newApiToken').value = "";
+  }
+}
+window.deleteApiToken = function(btn) {
+  btn.parentNode.remove();
+  showToast("Токен удалён","success");
+}
+function renderAdminIntegrations() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Интеграции</div>
+    <div>
+      <label><input type="checkbox" checked> Telegram боты</label><br>
+      <label><input type="checkbox"> Slack</label><br>
+      <label><input type="checkbox"> Webhook</label><br>
+      <button class="neon-btn" style="margin-top:10px;">Сохранить</button>
+    </div>
+  `;
+}
+function renderAdminCalendar() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Календарь</div>
+    <div>Мероприятия, задачи и события.<br><div style="margin-top:10px;">
+    <input class="neon-input" type="date">
+    <button class="neon-btn">Найти</button></div>
+    <ul style="color:#69fefd;margin-top:8px;">
+      <li>2025-09-30: Аудит логов</li>
+      <li>2025-09-28: Отчёт</li>
+    </ul>
+    </div>
+  `;
+}
+function renderAdminDocs() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Документация</div>
+    <div>
+      <ul style="text-align:left;color:#69fefd;">
+        <li><a href="#" style="color:#00ffe7;">API Reference</a></li>
+        <li><a href="#" style="color:#00ffe7;">Инструкция по запуску</a></li>
+        <li><a href="#" style="color:#00ffe7;">FAQ</a></li>
+      </ul>
+    </div>
+  `;
+}
+function renderAdminFAQ() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">FAQ/Помощь</div>
+    <div>
+      <details><summary>Как добавить девайс?</summary>Вкладка "Девайсы" → добавить.</details>
+      <details><summary>Как сменить тему?</summary>Вкладка "Темы/Стили" или "Настройки".</details>
+      <details><summary>Где скачать отчёты?</summary>Вкладка "Отчёты".</details>
+    </div>
+  `;
+}
+function renderAdminThemes() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Темы/Стили</div>
+    <div>
+      <button class="neon-btn" onclick="toggleTheme()">🌗 Переключить тему</button>
+      <button class="neon-btn" style="margin-left:10px;">+ Добавить свою тему</button>
+    </div>
+  `;
+}
+function renderAdminSyslogs() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Системные логи</div>
+    <div style="background:#232a3b;padding:10px 10px 10px 16px;border-radius:7px;max-height:135px;overflow-y:auto;">
+      [2025-09-30 11:00] Start panel<br>
+      [2025-09-30 11:01] Login: admin<br>
+      [2025-09-30 11:02] Device added: Samsung<br>
+      [2025-09-30 11:03] Backup created<br>
+      [2025-09-30 11:04] Error: no connection<br>
+    </div>
+  `;
+}
+function renderAdminBackups() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Бэкапы</div>
+    <div>
+      <button class="neon-btn">Создать бэкап</button>
+      <button class="neon-btn" style="margin-left:10px;">Восстановить</button>
+    </div>
+    <ul style="color:#69fefd;margin-top:8px;">
+      <li>2025-09-30-backup.zip <button class="neon-btn" style="padding:4px 10px;font-size:0.93rem;">Скачать</button></li>
+      <li>2025-09-28-backup.zip <button class="neon-btn" style="padding:4px 10px;font-size:0.93rem;">Скачать</button></li>
+    </ul>
+  `;
+}
+function renderAdminErrors() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Список ошибок</div>
+    <ul style="color:#ff3265;">
+      <li>[2025-09-29 11:14] Ошибка соединения с девайсом Xiaomi</li>
+      <li>[2025-09-30 10:47] Не удалось отправить SMS</li>
+    </ul>
+  `;
+}
+function renderAdminBulk() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Массовые действия</div>
+    <div>
+      <select class="neon-input" style="width:180px;">
+        <option>Выберите действие</option>
+        <option>Удалить выбранные</option>
+        <option>Экспортировать</option>
+      </select>
+      <button class="neon-btn" style="margin-left:10px;">Выполнить</button>
+    </div>
+  `;
+}
+function renderAdminMonitor() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Мониторинг</div>
+    <div>
+      <canvas id="monitorCanvas" style="width:99%;height:80px;background:#13172a;border-radius:8px;margin-bottom:10px;" height="80"></canvas>
+      <span>Реальное время: активность устройств, воркеров, ошибок.</span>
+    </div>
+  `;
+  setTimeout(()=>{
+    let can = document.getElementById('monitorCanvas');
+    let ctx = can.getContext('2d');
+    ctx.clearRect(0,0,can.width,can.height);
+    for(let i=0;i<20;i++){
+      ctx.fillStyle = "#00ffe7";
+      ctx.globalAlpha = Math.random()*0.7+0.3;
+      ctx.fillRect(i*can.width/20, 80-Math.random()*80, 10, Math.random()*80);
+    }
+    ctx.globalAlpha=1;
+  },100);
+}
+function renderAdminAdvdash() {
+  document.getElementById('adminTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Доп. Дашборд</div>
+    <div>
+      <canvas id="advdashCanvas" style="width:99%;height:100px;background:#13172a;border-radius:8px;margin-bottom:10px;" height="100"></canvas>
+      <span>Аналитика за всё время.</span>
+    </div>
+  `;
+  setTimeout(()=>{
+    let can = document.getElementById('advdashCanvas');
+    let ctx = can.getContext('2d');
+    ctx.clearRect(0,0,can.width,can.height);
+    ctx.strokeStyle="#00ffe7";
+    ctx.beginPath();
+    for(let i=0;i<20;i++){
+      let y = 95 - Math.abs(Math.sin(i/3))*90;
+      if(i===0) ctx.moveTo(i*can.width/20, y);
+      else ctx.lineTo(i*can.width/20, y);
+    }
+    ctx.stroke();
+  },100);
+}
+
+// 6. Добавляем обработку новых вкладок в renderAdminTab
+const prevAdminTab = renderAdminTab;
+renderAdminTab = function(tab) {
+  document.querySelectorAll('#adminTabs .panel-tab').forEach(t=>t.classList.remove('active'));
+  let sel = document.querySelector(`#adminTabs .panel-tab[data-tab="${tab}"]`);
+  if(sel) sel.classList.add('active');
+  switch(tab) {
+    case 'reports': renderAdminReports(); break;
+    case 'apitokens': renderAdminAPITokens(); break;
+    case 'integrations': renderAdminIntegrations(); break;
+    case 'calendar': renderAdminCalendar(); break;
+    case 'docs': renderAdminDocs(); break;
+    case 'faq': renderAdminFAQ(); break;
+    case 'themes': renderAdminThemes(); break;
+    case 'syslogs': renderAdminSyslogs(); break;
+    case 'backups': renderAdminBackups(); break;
+    case 'errors': renderAdminErrors(); break;
+    case 'bulk': renderAdminBulk(); break;
+    case 'monitor': renderAdminMonitor(); break;
+    case 'advdash': renderAdminAdvdash(); break;
+    default: prevAdminTab(tab);
+  }
+};
+
+// 7. User расширенные вкладки
+function renderUserCalendar() {
+  document.getElementById('userTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Календарь</div>
+    <div>Ваши события и задачи.<br>
+    <input class="neon-input" type="date" style="margin-top:10px;">
+    <ul style="color:#69fefd;margin-top:8px;">
+      <li>2025-09-30: Скачивание приложения</li>
+      <li>2025-09-28: Отправка SMS</li>
+    </ul>
+    </div>
+  `;
+}
+function renderUserFAQ() {
+  document.getElementById('userTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">FAQ/Помощь</div>
+    <div>
+      <details><summary>Как посмотреть устройства?</summary>Вкладка "Девайсы".</details>
+      <details><summary>Как изменить профиль?</summary>Кнопка "Профиль" сверху панели.</details>
+    </div>
+  `;
+}
+function renderUserThemes() {
+  document.getElementById('userTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Темы/Стили</div>
+    <div>
+      <button class="neon-btn" onclick="toggleTheme()">🌗 Переключить тему</button>
+    </div>
+  `;
+}
+function renderUserDocs() {
+  document.getElementById('userTabContent').innerHTML = `
+    <div style="font-size:1.13rem;color:#00ffe7;margin-bottom:10px;">Документация</div>
+    <div>
+      <ul style="text-align:left;color:#69fefd;">
+        <li><a href="#" style="color:#00ffe7;">Как пользоваться панелью</a></li>
+        <li><a href="#" style="color:#00ffe7;">FAQ</a></li>
+      </ul>
+    </div>
+  `;
+}
+const prevUserTab = renderUserTab;
+renderUserTab = function(tab) {
+  document.querySelectorAll('#userTabs .panel-tab').forEach(t=>t.classList.remove('active'));
+  let sel = document.querySelector(`#userTabs .panel-tab[data-tab="${tab}"]`);
+  if(sel) sel.classList.add('active');
+  switch(tab) {
+    case 'calendar': renderUserCalendar(); break;
+    case 'faq': renderUserFAQ(); break;
+    case 'themes': renderUserThemes(); break;
+    case 'docs': renderUserDocs(); break;
+    default: prevUserTab(tab);
+  }
+};
+</script>
