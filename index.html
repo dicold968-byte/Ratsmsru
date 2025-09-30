@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Cyber Android Panel</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      background: #0f1322;
+      color: #fff;
+      overflow-x: hidden;
+      transition: background 0.5s;
+    }
+    .neon-title {
+      font-size: 2.3rem;
+      text-align: center;
+      margin-bottom: 32px;
+      margin-top: 0;
+      color: #00ffe7;
+      text-shadow:
+        0 0 8px #00ffe7,
+        0 0 32px #00ffe7,
+        0 0 64px #0088ff;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+    .panel-box {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -47%);
+      background: rgba(25,34,54,0.93);
+      border-radius: 22px;
+      padding: 38px 38px 30px 38px;
+      box-shadow: 0 0 40px #00ffe7a0, 0 0 8px #1d3557;
+      min-width: 340px;
+      max-width: 99vw;
+      z-index: 2;
+    }
+    .panel-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .panel-tab {
+      font-size: 1.1rem;
+      padding: 8px 16px;
+      background: none;
+      border: none;
+      border-radius: 7px;
+      color: #00ffe7;
+      font-weight: 600;
+      cursor: pointer;
+      text-shadow: 0 0 7px #00ffe7;
+      transition: background .2s, color .2s;
+    }
+    .panel-tab.active, .panel-tab:hover {
+      background: #13172a;
+      color: #fff;
+      box-shadow: 0 0 8px #00ffe780;
+    }
+    .tab-content {
+      background: rgba(20,30,50,0.66);
+      border-radius: 13px;
+      padding: 22px 13px 13px 13px;
+      min-height: 95px;
+      font-size: 1.11rem;
+      color: #00ffe7;
+      text-shadow: 0 0 8px #00ffe750;
+      margin-bottom: 0;
+      box-shadow: 0 0 25px #00ffe731;
+      transition: background .4s;
+    }
+    .auth-panel {
+      margin-top: 7vh;
+      min-width: 320px;
+      background: rgba(25,34,54,0.88);
+      border-radius: 18px;
+      padding: 40px 36px 32px 36px;
+      box-shadow: 0 0 40px #00ffe7a0, 0 0 8px #1d3557;
+      z-index: 2;
+      text-align: center;
+      position: relative;
+    }
+    .neon-label {
+      font-size: 1.16rem;
+      margin-bottom: 8px;
+      color: #00ffe7;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 8px #00ffe7;
+      font-weight: 500;
+      display: block;
+      text-align: left;
+    }
+    .neon-input {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 1.1rem;
+      border: 2px solid #00ffe7;
+      border-radius: 8px;
+      background: #13172a;
+      color: #00ffe7;
+      outline: none;
+      box-shadow: 0 0 8px #00ffe760;
+      margin-bottom: 22px;
+      transition: border-color .2s;
+    }
+    .neon-input:focus {
+      border-color: #00bfff;
+    }
+    .neon-btn {
+      padding: 12px 32px;
+      background: linear-gradient(90deg, #00ffe7 0%, #0088ff 100%);
+      color: #02131c;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 18px #00ffe7a0, 0 0 6px #0088ff;
+      text-shadow: 0 0 4px #00ffe7;
+      letter-spacing: 1px;
+      transition: background .2s;
+    }
+    .neon-btn:hover {
+      background: linear-gradient(90deg, #0088ff 0%, #00ffe7 100%);
+      color: #fff;
+    }
+    .profile-userbox {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-bottom: 10px;
+    }
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2.5px solid #00ffe7;
+      box-shadow: 0 0 14px #00ffe7a0;
+      object-fit: cover;
+      background: #13172a;
+      margin-right: 10px;
+    }
+    .profile-userbox .user-info {
+      flex: 1;
+    }
+    .noti-dot {
+      height: 11px;
+      width: 11px;
+      border-radius: 50%;
+      display: inline-block;
+      background: #ff3265;
+      margin-left: 7px;
+      box-shadow: 0 0 9px #ff3265;
+    }
+    .mini-card-row {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 17px;
+      justify-content: space-between;
+    }
+    .mini-card {
+      background: rgba(15,45,50,0.9);
+      box-shadow: 0 0 13px #00ffe744;
+      border-radius: 11px;
+      padding: 17px 18px 10px 18px;
+      min-width: 120px;
+      flex: 1 1 120px;
+      color: #69fefd;
+      text-align: center;
+      font-size: 1.11rem;
+      margin: 0 0 7px 0;
+    }
+    .mini-card .label {
+      font-size: 0.98rem;
+      color: #0088ff;
+      margin-bottom: 5px;
+      display: block;
+    }
+    .stat-graph-canvas {
+      width: 99%;
+      height: 130px;
+      background: rgba(10,22,32,0.22);
+      border-radius: 11px;
+      margin-bottom: 10px;
+      box-shadow: 0 0 10px #00ffe7a0;
+    }
+    .filter-box {
+      margin-bottom: 10px;
+      text-align: right;
+    }
+    .filter-box input, .filter-box select {
+      background: #13172a;
+      color: #00ffe7;
+      border: 1.5px solid #00ffe7;
+      border-radius: 6px;
+      padding: 5px 10px;
+      margin-right: 7px;
+      font-size: 1.02rem;
+      box-shadow: 0 0 5px #00ffe730;
+      transition: border .2s, background .2s;
+    }
+    .filter-box select {
+      min-width: 80px;
+    }
+    .table-list {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 1.01rem;
+      background: rgba(10,22,32,0.28);
+      border-radius: 10px;
+      overflow: hidden;
+      color: #fff;
+      margin-bottom: 7px;
+      box-shadow: 0 0 13px #00ffe744;
+    }
+    .table-list th, .table-list td {
+      padding: 8px 13px;
+      border-bottom: 1px solid #0088ff44;
+      text-align: center;
+    }
+    .table-list th {
+      background: #0d1730;
+      color: #00ffe7;
+      text-shadow: 0 0 6px #00ffe7;
+      font-weight: 600;
+    }
+    .table-list tr:last-child td {
+      border-bottom: none;
+    }
+    .notification-list {
+      background: rgba(20,30,50,0.59);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 1.01rem;
+      color: #00ffe7;
+      box-shadow: 0 0 5px #0088ff50;
+      margin-bottom: 12px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .notification-item {
+      margin-bottom: 5px;
+      padding-left: 5px;
+      border-left: 2px solid #00ffe7;
+      font-size: 0.98rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background .18s;
+    }
+    .notification-item.unread {
+      background: #00ffe718;
+      color: #0f1322;
+      font-weight: 700;
+    }
+    .notification-dot {
+      width: 9px; height: 9px; border-radius: 50%; background: #00ffe7; display: inline-block;
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,18,34,0.93);
+      z-index: 10;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.22s;
+    }
+    .modal {
+      background: #192236;
+      border-radius: 14px;
+      padding: 30px 24px 18px 24px;
+      min-width: 310px;
+      max-width: 95vw;
+      box-shadow: 0 0 50px #00ffe7a0, 0 0 14px #0088ff;
+      color: #00ffe7;
+      animation: popIn 0.22s;
+      position: relative;
+    }
+    .modal .close-btn {
+      position: absolute;
+      right: 10px; top: 10px;
+      color: #00ffe7;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      text-shadow: 0 0 8px #00ffe7;
+      transition: color .18s;
+    }
+    .modal .close-btn:hover { color: #ff3265; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @media (max-width: 700px) {
+      .panel-box, .modal { min-width: 92vw; padding: 16px 3vw 10px 3vw; }
+      .neon-title { font-size: 1.1rem; }
+      .panel-tabs { gap: 3px; }
+      .modal { padding: 12px 3vw 10px 3vw; }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-cyber">
+    <canvas id="cyber-grid"></canvas>
+  </div>
+  <div class="auth-panel" id="authPanel">
+    <div class="neon-title">Вход в панель управления</div>
+    <label class="neon-label" for="tokenInput">Введите токен:</label>
+    <input class="neon-input" type="password" id="tokenInput" placeholder="Ваш токен..." autocomplete="off">
+    <button class="neon-btn" id="loginBtn">Войти</button>
+    <div id="loginError" style="margin-top:18px;color:#ff3265;font-size:1.07rem;display:none;">
+      Неверный токен!<br>
+      <span style="color:#00ffe7;font-size:1.08rem;">Для получения токена обратитесь к администратору</span>
+    </div>
+  </div>
+  <div class="panel-box" id="adminPanel" style="display:none;">
+    <div class="profile-userbox">
+      <img class="avatar" src="https://api.dicebear.com/7.x/miniavs/svg?seed=Admin" alt="avatar">
+      <div class="user-info">
+        <div style="font-weight:600;color:#00ffe7;">Администратор</div>
+        <div style="font-size:0.92rem;color:#0088ff;">admin@cyberpanel</div>
+      </div>
+      <button class="neon-btn" id="adminProfileBtn" style="padding:7px 15px;font-size:0.97rem;">Профиль</button>
+    </div>
+    <div class="neon-title" style="margin-top:0;">Cyber Android Admin Panel</div>
+    <div class="panel-tabs" id="adminTabs">
+      <button class="panel-tab active" data-tab="dashboard">Дашборд</button>
+      <button class="panel-tab" data-tab="devices">Девайсы</button>
+      <button class="panel-tab" data-tab="sms">СМС</button>
+      <button class="panel-tab" data-tab="workers">Воркеры</button>
+      <button class="panel-tab" data-tab="downloads">Скачивания</button>
+      <button class="panel-tab" data-tab="notifications">Уведомления</button>
+      <button class="panel-tab" data-tab="settings">Настройки</button>
+      <button class="panel-tab" data-tab="about">О панели</button>
+    </div>
+    <div class="tab-content" id="adminTabContent">
+      <!-- Контент вкладок -->
+    </div>
+  </div>
+  <div class="panel-box" id="userPanel" style="display:none;">
+    <div class="profile-userbox">
+      <img class="avatar" src="https://api.dicebear.com/7.x/miniavs/svg?seed=User" alt="avatar">
+      <div class="user-info">
+        <div style="font-weight:600;color:#00ffe7;">Пользователь</div>
+        <div style="font-size:0.92rem;color:#0088ff;">user@cyberpanel</div>
+      </div>
+      <button class="neon-btn" id="userProfileBtn" style="padding:7px 15px;font-size:0.97rem;">Профиль</button>
+    </div>
+    <div class="neon-title" style="margin-top:0;">Cyber Android User Panel</div>
+    <div class="panel-tabs" id="userTabs">
+      <button class="panel-tab active" data-tab="dashboard">Дашборд</button>
+      <button class="panel-tab" data-tab="devices">Девайсы</button>
+      <button class="panel-tab" data-tab="sms">СМС</button>
+      <button class="panel-tab" data-tab="downloads">Скачивания</button>
+      <button class="panel-tab" data-tab="notifications">Уведомления</button>
+      <button class="panel-tab" data-tab="settings">Настройки</button>
+      <button class="panel-tab" data-tab="about">О панели</button>
+    </div>
+    <div class="tab-content" id="userTabContent"></div>
+  </div>
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" id="modalContent">
+      <button class="close-btn" id="closeModalBtn">&times;</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  <script>
+    // --- Neon Grid Background ---
+    const canvas = document.getElementById('cyber-grid');
+    const ctx = canvas.getContext('2d');
+    let width, height, gridX = 25, gridY = 12;
+    let points = [];
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      points = [];
+      for (let y = 0; y < gridY; y++) {
+        for (let x = 0; x < gridX; x++) {
+          const px = x / (gridX - 1);
+          const py = y / (gridY - 1);
+          points.push({
+            x: px * width,
+            y: py * height,
+            baseX: px * width,
+            baseY: py * height,
+            t: Math.random() * 100
+          });
+        }
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    function animateGrid() {
+      ctx.clearRect(0, 0, width, height);
+      for (let i = 0; i < points.length; i++) {
+        let p = points[i];
+        let mx = Math.sin((Date.now()/900 + p.t) + p.baseY/210) * 24;
+        let my = Math.cos((Date.now()/1100 + p.t) + p.baseX/180) * 18;
+        let squeeze = 1 + Math.sin(Date.now()/1500 + p.baseY/120) * 0.08;
+        p.x = (p.baseX - width/2) * squeeze + width/2 + mx;
+        p.y = (p.baseY - height/2) * squeeze + height/2 + my;
+      }
+      ctx.save();
+      ctx.globalAlpha = 0.5;
+      ctx.strokeStyle = '#00ffe7';
+      ctx.shadowColor = '#00ffe7';
+      ctx.shadowBlur = 12;
+      for (let y = 0; y < gridY; y++) {
+        ctx.beginPath();
+        for (let x = 0; x < gridX; x++) {
+          let idx = y * gridX + x;
+          if (x === 0) ctx.moveTo(points[idx].x, points[idx].y);
+          else ctx.lineTo(points[idx].x, points[idx].y);
+        }
+        ctx.stroke();
+      }
+      for (let x = 0; x < gridX; x++) {
+        ctx.beginPath();
+        for (let y = 0; y < gridY; y++) {
+          let idx = y * gridX + x;
+          if (y === 0) ctx.moveTo(points[idx].x, points[idx].y);
+          else ctx.lineTo(points[idx].x, points[idx].y);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+      requestAnimationFrame(animateGrid);
+    }
+    animateGrid();
+
+    // --- Demo Data ---
+    const ADMIN_TOKEN = "admin-token-123";
+    const USER_TOKEN = "user-token-456";
+    let devices = [
+      {ip: "192.168.0.105", os: "Android 10", brand: "Samsung", battery: 87, smsDelivery: "95%", status: "online", lastAction: "2025-09-30 13:42"},
+      {ip: "192.168.0.112", os: "Android 13", brand: "Xiaomi", battery: 54, smsDelivery: "82%", status: "offline", lastAction: "2025-09-29 19:09"},
+      {ip: "192.168.0.117", os: "Android 11", brand: "OnePlus", battery: 65, smsDelivery: "89%", status: "online", lastAction: "2025-09-30 10:21"},
+    ];
+    let workers = [
+      {id: "worker-0231", sum: "$1,000", status: "active"},
+      {id: "worker-6453", sum: "$2,100", status: "inactive"},
+      {id: "worker-7987", sum: "$12,000", status: "active"},
+    ];
+    let downloads = [
+      {id: "dl-001", site: "android-app-site", status: "Успешно", date: "2025-09-28"},
+      {id: "dl-002", site: "android-app-site", status: "Успешно", date: "2025-09-29"},
+      {id: "dl-003", site: "demo-site", status: "Ошибка", date: "2025-09-29"},
+    ];
+    let notifications = [
+      {msg: "Новое устройство подключено: Samsung 192.168.0.105", time: "1 мин назад", unread: true},
+      {msg: "Воркер worker-0231 завершил задачу", time: "10 мин назад", unread: false},
+      {msg: "Ошибка скачивания на demo-site", time: "Вчера", unread: true},
+      {msg: "Пользователь сменил токен", time: "2 дня назад", unread: false},
+    ];
+
+    // --- Модальное окно ---
+    function showModal(html) {
+      document.getElementById('modalBody').innerHTML = html;
+      document.getElementById('modalBackdrop').style.display = 'flex';
+    }
+    function closeModal() {
+      document.getElementById('modalBackdrop').style.display = 'none';
+    }
+    document.getElementById('closeModalBtn').onclick = closeModal;
+    document.getElementById('modalBackdrop').onclick = function(e) {
+      if (e.target === this) closeModal();
+    };
+
+    // --- График (canvas) ---
+    function renderStatGraph(ctx, values, labels) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      let max = Math.max(...values, 1);
+      let w = ctx.canvas.width, h = ctx.canvas.height;
+      let stepX = w / (values.length-1);
+      ctx.save();
+      ctx.strokeStyle="#00ffe729";
+      for(let i=0;i<5;i++) {
+        ctx.beginPath();
+        let y = h-((h-18)/4)*i;
+        ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.strokeStyle="#00ffe7";
+      ctx.lineWidth=3;
+      for(let i=0;i<values.length;i++){
+        let x = i*stepX, y = h-((h-18)*values[i]/max);
+        if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.shadowColor="#00ffe7"; ctx.shadowBlur=14;
+      ctx.stroke(); ctx.shadowBlur=0;
+      for(let i=0;i<values.length;i++){
+        let x = i*stepX, y = h-((h-18)*values[i]/max);
+        ctx.beginPath();
+        ctx.arc(x,y,6,0,2*Math.PI);
+        ctx.fillStyle="#00ffe7"; ctx.globalAlpha=0.78;
+        ctx.fill();
+      }
+      ctx.globalAlpha=1;
+      ctx.font="13px Segoe UI";
+      ctx.fillStyle="#00ffe7";
+      for(let i=0;i<labels.length;i++){
+        ctx.fillText(labels[i], i*stepX-9, h-2);
+      }
+      ctx.restore();
+    }
+
+    // --- Авторизация ---
+    document.getElementById('loginBtn').onclick = function() {
+      const tokenValue = document.getElementById('tokenInput').value.trim();
+      if (tokenValue === ADMIN_TOKEN) {
+        document.getElementById('authPanel').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        renderAdminTab('dashboard');
+      } else if (tokenValue === USER_TOKEN) {
+        document.getElementById('authPanel').style.display = 'none';
+        document.getElementById('userPanel').style.display = 'block';
+        renderUserTab('dashboard');
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    };
+
+    // --- Admin Tabs ---
+    function renderAdminDashboard() {
+      document.getElementById('adminTabContent').innerHTML = `
+        <div class="mini-card-row">
+          <div class="mini-card"><span class="label">Девайсы</span>${devices.length}</div>
+          <div class="mini-card"><span class="label">Воркеры</span>${workers.length}</div>
+          <div class="mini-card"><span class="label">Скачивания</span>${downloads.length}</div>
+          <div class="mini-card"><span class="label">Уведомления</span>${notifications.filter(n=>n.unread).length}
+            ${notifications.filter(n=>n.unread).length>0?'<span class="noti-dot"></span>':''}
+          </div>
+        </div>
+        <canvas id="statGraph" class="stat-graph-canvas" height="130"></canvas>
+        <div style="text-align:center;margin-bottom:7px;">
+          <span style="color:#69fefd;">Статистика подключённых устройств за неделю</span>
+        </div>
+      `;
+      setTimeout(()=>{
+        let ctx=document.getElementById('statGraph').getContext('2d');
+        renderStatGraph(ctx, [2,3,5,3,7,4,devices.length], ["ПН","ВТ","СР","ЧТ","ПТ","СБ","ВС"]);
+      },80);
+    }
+    function renderAdminDevices() {
+      document.getElementById('adminTabContent').innerHTML = `
+        <div class="filter-box">
+          <input type="text" id="deviceSearch" placeholder="Поиск по IP/бренду">
+        </div>
+        <table class="table-list">
+          <tr>
+            <th>IP</th>
+            <th>ОС</th>
+            <th>Бренд</th>
+            <th>Заряд</th>
+            <th>SMS</th>
+            <th>Статус</th>
+            <th>Действия</th>
+          </tr>
+          ${devices.map((d,i) =>
+            `<tr>
+              <td>${d.ip}</td>
+              <td>${d.os}</td>
+              <td>${d.brand}</td>
+              <td>${d.battery}%</td>
+              <td>${d.smsDelivery}</td>
+              <td><span style="color:${d.status==='online'?'#00ffe7':'#ff3265'}">${d.status}</span></td>
+              <td><button class="neon-btn" style="padding:5px 12px;font-size:0.93rem;" onclick="showModalDevice(${i})">Подробнее</button></td>
+            </tr>`
+          ).join("")}
+        </table>
+      `;
+      document.getElementById('deviceSearch').oninput = function() {
+        let val = this.value.trim().toLowerCase();
+        let filtered = devices.filter(d =>
+          d.ip.includes(val) || d.brand.toLowerCase().includes(val)
+        );
+        let html = `
+          <tr>
+            <th>IP</th>
+            <th>ОС</th>
+            <th>Бренд</th>
+            <th>Заряд</th>
+            <th>SMS</th>
+            <th>Статус</th>
+            <th>Действия</th>
+          </tr>
+          ${filtered.map((d,i) =>
+            `<tr>
+              <td>${d.ip}</td>
+              <td>${d.os}</td>
+              <td>${d.brand}</td>
+              <td>${d.battery}%</td>
+              <td>${d.smsDelivery}</td>
+              <td><span style="color:${d.status==='online'?'#00ffe7':'#ff3265'}">${d.status}</span></td>
+              <td><button class="neon-btn" style="padding:5px 12px;font-size:0.93rem;" onclick="showModalDevice(${i})">Подробнее</button></td>
+            </tr>`
+          ).join("")}
+        `;
+        document.querySelector('#adminTabContent .table-list').innerHTML = html;
+      };
+    }
+    window.showModalDevice = function(i) {
+      let d = devices[i];
+      showModal(`
+        <div>
+          <div style="font-size:1.12rem;color:#00ffe7;">Девайс: ${d.brand}</div>
+          <div>IP: <b>${d.ip}</b></div>
+          <div>ОС: <b>${d.os}</b></div>
+          <div>Заряд: <b>${d.battery}%</b></div>
+          <div>Доходимость SMS: <b>${d.smsDelivery}</b></div>
+          <div>Статус: <b style="color:${d.status==='online'?'#00ffe7':'#ff3265'}">${d.status}</b></div>
+          <div>Последнее действие: <b>${d.lastAction}</b></div>
+        </div>
+      `);
+    };
+    function renderAdminSMS() {
+      document.getElementById('adminTabContent').innerHTML = `
+        <div style="margin-bottom:14px;">Доходимость SMS по девайсам:</div>
+        ${devices.map(d => `<div>${d.brand} (${d.ip}): <b>${d.smsDelivery}</b></div>`).join("")}
+      `;
+    }
+    function renderAdminWorkers() {
+      document.getElementById('adminTabContent').innerHTML = `
+        <table class="table-list">
+          <tr>
+            <th>ID воркера</th>
+            <th>Сумма</th>
+            <th>Статус</th>
+          </tr>
+          ${workers.map(w =>
+            `<tr>
+              <td>${w.id}</td>
+              <td>${w.sum}</td>
+              <td><span style="color:${w.status==='active'?'#00ffe7':'#ff3265'}">${w.status}</span></td>
+            </tr>`
+          ).join("")}
+        </table>
+      `;
+    }
+    function renderAdminDownloads() {
+      document.getElementById('adminTabContent').innerHTML = `
+        <table class="table-list">
+          <tr>
+            <th>ID</th>
+            <th>Сайт</th>
+            <th>Статус</th>
+            <th>Дата</th>
+          </tr>
+          ${downloads.map(dl => `
+            <tr>
+              <td>${dl.id}</td>
+              <td>${dl.site}</td>
+              <td>${dl.status}</td>
+              <td>${dl.date}</td>
+            </tr>
+          `).join("")}
+        </table>
+      `;
+    }
+    function renderAdminNotifications() {
+      document.getElementById('adminTabContent').innerHTML = `
+        <div class="notification-list">
+          ${notifications.map(n=>`
+            <div class="notification-item${n.unread?' unread':''}">
+              ${n.unread?'<span class="notification-dot"></span>':''}
+              <span>${n.msg}</span>
+              <span style="margin-left:auto;font-size:0.93rem;color:#0088ff;">${n.time}</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+    function renderAdminSettings() {
+      document.getElementById('adminTabContent').innerHTML = `
+        <div style="padding:8px 0;">
+          <span style="color:#00ffe7;font-size:1.04rem;">Настройки панели</span><br>
+          <button class="neon-btn" onclick="toggleTheme()" style="margin-top:9px;">🌗 Переключить тему</button>
+        </div>
+      `;
+    }
+    function renderAdminAbout() {
+      document.getElementById('adminTabContent').innerHTML = `
+        <div>
+          <span style="color:#69fefd;">likov panel by <b>@minorhik</b></span>
+          <br>
+          Cyber Neon Панель управления Android<br>Автор: dicold968-byte
+        </div>
+      `;
+    }
+    function renderAdminProfile() {
+      showModal(`
+        <div style="text-align:center">
+          <img class="avatar" src="https://api.dicebear.com/7.x/miniavs/svg?seed=Admin" alt="avatar" style="margin-bottom:15px;">
+          <div style="color:#00ffe7;font-size:1.13rem;">Профиль администратора</div>
+          <div style="margin-bottom:10px;">Логин: <b>admin</b></div>
+          <div>
+            <label>Сменить токен:</label>
+            <input class="neon-input" type="password" placeholder="Новый токен..." id="adminNewToken"><br>
+            <button class="neon-btn" style="margin-top:7px;">Сохранить</button>
+          </div>
+        </div>
+      `);
+    }
+    document.getElementById('adminProfileBtn').onclick = renderAdminProfile;
+    function renderAdminTab(tab) {
+      document.querySelectorAll('#adminTabs .panel-tab').forEach(t=>t.classList.remove('active'));
+      document.querySelector(`#adminTabs .panel-tab[data-tab="${tab}"]`).classList.add('active');
+      switch(tab) {
+        case 'dashboard': renderAdminDashboard(); break;
+        case 'devices': renderAdminDevices(); break;
+        case 'sms': renderAdminSMS(); break;
+        case 'workers': renderAdminWorkers(); break;
+        case 'downloads': renderAdminDownloads(); break;
+        case 'notifications': renderAdminNotifications(); break;
+        case 'settings': renderAdminSettings(); break;
+        case 'about': renderAdminAbout(); break;
+      }
+    }
+    document.querySelectorAll('#adminTabs .panel-tab').forEach(tab=>{
+      tab.onclick = ()=> renderAdminTab(tab.dataset.tab);
+    });
+
+    // --- User Tabs ---
+    function renderUserDashboard() {
+      document.getElementById('userTabContent').innerHTML = `
+        <div class="mini-card-row">
+          <div class="mini-card"><span class="label">Девайсы</span>${devices.length}</div>
+          <div class="mini-card"><span class="label">Скачивания</span>${downloads.length}</div>
+          <div class="mini-card"><span class="label">Уведомления</span>${notifications.filter(n=>n.unread).length}
+            ${notifications.filter(n=>n.unread).length>0?'<span class="noti-dot"></span>':''}
+          </div>
+        </div>
+        <canvas id="userStatGraph" class="stat-graph-canvas" height="130"></canvas>
+        <div style="text-align:center;margin-bottom:7px;">
+          <span style="color:#69fefd;">Статистика скачиваний за неделю</span>
+        </div>
+      `;
+      setTimeout(()=>{
+        let ctx=document.getElementById('userStatGraph').getContext('2d');
+        renderStatGraph(ctx, [0,1,2,1,1,2,downloads.length], ["ПН","ВТ","СР","ЧТ","ПТ","СБ","ВС"]);
+      },80);
+    }
+    function renderUserDevices() {
+      document.getElementById('userTabContent').innerHTML = `
+        <div class="filter-box">
+          <input type="text" id="userDeviceSearch" placeholder="Поиск по IP/бренду">
+        </div>
+        <table class="table-list">
+          <tr>
+            <th>IP</th>
+            <th>ОС</th>
+            <th>Бренд</th>
+            <th>Заряд</th>
+            <th>SMS</th>
+            <th>Подробнее</th>
+          </tr>
+          ${devices.map((d,i) =>
+            `<tr>
+              <td>${d.ip}</td>
+              <td>${d.os}</td>
+              <td>${d.brand}</td>
+              <td>${d.battery}%</td>
+              <td>${d.smsDelivery}</td>
+              <td><button class="neon-btn" style="padding:5px 12px;font-size:0.93rem;" onclick="showModalDevice(${i})">Открыть</button></td>
+            </tr>`
+          ).join("")}
+        </table>
+      `;
+      document.getElementById('userDeviceSearch').oninput = function() {
+        let val = this.value.trim().toLowerCase();
+        let filtered = devices.filter(d =>
+          d.ip.includes(val) || d.brand.toLowerCase().includes(val)
+        );
+        let html = `
+          <tr>
+            <th>IP</th>
+            <th>ОС</th>
+            <th>Бренд</th>
+            <th>Заряд</th>
+            <th>SMS</th>
+            <th>Подробнее</th>
+          </tr>
+          ${filtered.map((d,i) =>
+            `<tr>
+              <td>${d.ip}</td>
+              <td>${d.os}</td>
+              <td>${d.brand}</td>
+              <td>${d.battery}%</td>
+              <td>${d.smsDelivery}</td>
+              <td><button class="neon-btn" style="padding:5px 12px;font-size:0.93rem;" onclick="showModalDevice(${i})">Открыть</button></td>
+            </tr>`
+          ).join("")}
+        `;
+        document.querySelector('#userTabContent .table-list').innerHTML = html;
+      };
+    }
+    function renderUserSMS() {
+      document.getElementById('userTabContent').innerHTML = `
+        <div style="margin-bottom:14px;">Доходимость SMS по девайсам:</div>
+        ${devices.map(d => `<div>${d.brand} (${d.ip}): <b>${d.smsDelivery}</b></div>`).join("")}
+      `;
+    }
+    function renderUserDownloads() {
+      document.getElementById('userTabContent').innerHTML = `
+        <table class="table-list">
+          <tr>
+            <th>ID</th>
+            <th>Сайт</th>
+            <th>Статус</th>
+            <th>Дата</th>
+          </tr>
+          ${downloads.map(dl => `
+            <tr>
+              <td>${dl.id}</td>
+              <td>${dl.site}</td>
+              <td>${dl.status}</td>
+              <td>${dl.date}</td>
+            </tr>
+          `).join("")}
+        </table>
+      `;
+    }
+    function renderUserNotifications() {
+      document.getElementById('userTabContent').innerHTML = `
+        <div class="notification-list">
+          ${notifications.map(n=>`
+            <div class="notification-item${n.unread?' unread':''}">
+              ${n.unread?'<span class="notification-dot"></span>':''}
+              <span>${n.msg}</span>
+              <span style="margin-left:auto;font-size:0.93rem;color:#0088ff;">${n.time}</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+    function renderUserSettings() {
+      document.getElementById('userTabContent').innerHTML = `
+        <div style="padding:8px 0;">
+          <span style="color:#00ffe7;font-size:1.04rem;">Настройки пользователя</span><br>
+          <button class="neon-btn" onclick="toggleTheme()" style="margin-top:9px;">🌗 Переключить тему</button>
+        </div>
+      `;
+    }
+    function renderUserAbout() {
+      document.getElementById('userTabContent').innerHTML = `
+        <div>
+          <span style="color:#69fefd;">likov panel by <b>@minorhik</b></span>
+          <br>
+          Cyber Neon Панель управления Android<br>Автор: dicold968-byte
+        </div>
+      `;
+    }
+    function renderUserProfile() {
+      showModal(`
+        <div style="text-align:center">
+          <img class="avatar" src="https://api.dicebear.com/7.x/miniavs/svg?seed=User" alt="avatar" style="margin-bottom:15px;">
+          <div style="color:#00ffe7;font-size:1.13rem;">Профиль пользователя</div>
+          <div style="margin-bottom:10px;">Логин: <b>user</b></div>
+          <div>
+            <label>Сменить токен:</label>
+            <input class="neon-input" type="password" placeholder="Новый токен..." id="userNewToken"><br>
+            <button class="neon-btn" style="margin-top:7px;">Сохранить</button>
+          </div>
+        </div>
+      `);
+    }
+    document.getElementById('userProfileBtn').onclick = renderUserProfile;
+    function renderUserTab(tab) {
+      document.querySelectorAll('#userTabs .panel-tab').forEach(t=>t.classList.remove('active'));
+      document.querySelector(`#userTabs .panel-tab[data-tab="${tab}"]`).classList.add('active');
+      switch(tab) {
+        case 'dashboard': renderUserDashboard(); break;
+        case 'devices': renderUserDevices(); break;
+        case 'sms': renderUserSMS(); break;
+        case 'downloads': renderUserDownloads(); break;
+        case 'notifications': renderUserNotifications(); break;
+        case 'settings': renderUserSettings(); break;
+        case 'about': renderUserAbout(); break;
+      }
+    }
+    document.querySelectorAll('#userTabs .panel-tab').forEach(tab=>{
+      tab.onclick = ()=> renderUserTab(tab.dataset.tab);
+    });
+
+    // --- Theme ---
+    function toggleTheme() {
+      document.body.classList.toggle('light-theme');
+    }
+  </script>
+</body>
+</html>
